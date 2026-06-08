@@ -31,7 +31,7 @@ jobs:
       - name: Prepare standalone package
         run: |
           cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
+          [ -d public ] && cp -r public .next/standalone/public || true
           cd .next/standalone
           zip -r ../../deployment.zip .
 
