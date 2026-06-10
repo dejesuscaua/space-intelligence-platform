@@ -35,10 +35,14 @@ export default function Hero() {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        background: 'var(--gradient-hero)',
+        /* Semi-transparente: deixa o starfield global em canvas aparecer */
+        background: 'linear-gradient(135deg, rgba(10,15,30,0.55) 0%, rgba(13,21,48,0.45) 50%, rgba(10,22,40,0.55) 100%)',
         position: 'relative',
       }}
     >
+      {/* Grid de horizonte futurista */}
+      <div className="hero-grid" aria-hidden="true" />
+
       {/* Ambient orbs */}
       <div
         style={{

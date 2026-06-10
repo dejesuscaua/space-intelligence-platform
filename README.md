@@ -53,7 +53,7 @@ GitHub (código)
     ↓ git push main
 GitHub Actions (CI/CD)
     ↓ build + deploy
-Azure App Service (Node 20 LTS, HTTPS only)
+Azure App Service (Node 22 LTS, HTTPS only)
     ↓ monitoramento
 Application Insights + Log Analytics Workspace
     ↓ segredos
@@ -64,7 +64,7 @@ Azure Key Vault (SpacePlatformApiKey, AppInsightsConnectionString)
 
 ## Pré-requisitos
 
-- [Node.js 20+](https://nodejs.org)
+- [Node.js 22+](https://nodejs.org)
 - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
 - Conta Azure (subscription educacional FIAP)
 - Conta GitHub
@@ -111,35 +111,25 @@ az deployment group show \
 
 ---
 
-### 2. Gerar Service Principal para o GitHub Actions
+### 2. Obter Publish Profile do Azure App Service
 
-```bash
-# Obter ID da subscription
-SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+No Azure Portal:
 
-# Criar Service Principal com role Contributor no Resource Group
-az ad sp create-for-rbac \
-  --name "sp-space-platform-github" \
-  --role contributor \
-  --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/rg-space-platform \
-  --sdk-auth
-```
-
-> **Copie o JSON inteiro** que aparecer — ele será o valor do secret `AZURE_CREDENTIALS`.
+1. Acesse o App Service `space-intelligence-platform`
+2. Clique em **Overview → Download publish profile**
+3. Abra o arquivo `.PublishSettings` baixado e copie **todo o conteúdo XML**
 
 ---
 
-### 3. Configurar GitHub Secrets
+### 3. Configurar GitHub Secret
 
 No repositório GitHub → **Settings → Secrets and variables → Actions → New repository secret**:
 
 | Secret | Valor |
 |---|---|
-| `AZURE_CREDENTIALS` | JSON completo gerado no passo 2 |
-| `AZURE_APP_NAME` | `space-intelligence-platform` |
-| `AZURE_RESOURCE_GROUP` | `rg-space-platform` |
+| `AZURE_WEBAPP_PUBLISH_PROFILE` | Conteúdo XML completo do arquivo `.PublishSettings` |
 
-> **Print esperado:** Tela do GitHub com os 3 secrets listados (valores ocultos).
+> **Print esperado:** Tela do GitHub com o secret `AZURE_WEBAPP_PUBLISH_PROFILE` listado (valor oculto).
 
 ---
 
@@ -154,11 +144,6 @@ Para verificar no portal:
 > Azure Portal → Key Vault `kv-space-platform` → Access control (IAM) → Role assignments
 
 > **Print esperado:** Lista mostrando a Managed Identity do App Service com role "Key Vault Secrets User".
-
-Para documentar o Service Principal do GitHub Actions:
-> Azure Portal → Resource Group `rg-space-platform` → Access control (IAM) → Role assignments
-
-> **Print esperado:** Service Principal `sp-space-platform-github` com role "Contributor".
 
 ---
 
@@ -282,7 +267,7 @@ space-intelligence-platform/
 
 | Prática | Como aplicada |
 |---|---|
-| Credenciais no GitHub Secrets | `AZURE_CREDENTIALS`, `AZURE_APP_NAME`, `AZURE_RESOURCE_GROUP` |
+| Credenciais no GitHub Secrets | `AZURE_WEBAPP_PUBLISH_PROFILE` (Publish Profile do App Service) |
 | Azure Key Vault | `SpacePlatformApiKey`, `AppInsightsConnectionString` |
 | HTTPS obrigatório | `httpsOnly: true` no Bicep |
 | Managed Identity | App Service acessa Key Vault sem senha hardcoded |

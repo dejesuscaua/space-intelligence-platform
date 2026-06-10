@@ -47,11 +47,22 @@ body {
 /* ===================== GLASSMORPHISM ===================== */
 
 .glass-card {
-  background: var(--bg-card);
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(0, 212, 255, 0.05), rgba(13, 21, 48, 0) 40%),
+    var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--accent-cyan-border);
   border-radius: 12px;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 212, 255, 0.45);
+  box-shadow:
+    0 0 28px rgba(0, 212, 255, 0.10),
+    inset 0 0 22px rgba(0, 212, 255, 0.04);
 }
 
 /* ===================== TYPOGRAPHY ===================== */
@@ -80,7 +91,8 @@ body {
 }
 
 .section-alt {
-  background-color: var(--bg-secondary);
+  /* Semi-transparente para o starfield global aparecer por trás */
+  background-color: rgba(13, 21, 48, 0.45);
   padding: clamp(56px, 8vw, 96px) clamp(16px, 4vw, 24px);
 }
 
@@ -1244,6 +1256,184 @@ html, body { height: 100%; }
   .bottom-tabs { display: flex; }
   .app-main { padding-bottom: 58px; }
 }
+
+/* ===================== DEEP SPACE FX ===================== */
+
+/* Canvas de fundo global — estrelas, nebulosas e meteoros */
+.space-bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* App shell transparente para o canvas aparecer */
+.app-shell { background: transparent; }
+
+/* Transição cinematográfica entre módulos */
+@keyframes moduleEnter {
+  from { opacity: 0; transform: translateY(18px) scale(0.995); filter: blur(5px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+.module-enter { animation: moduleEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Grid de horizonte futurista (hero) */
+@keyframes gridPan {
+  from { background-position: 0 0; }
+  to   { background-position: 0 44px; }
+}
+.hero-grid {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 34vh;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.09) 1px, transparent 1px);
+  background-size: 44px 44px;
+  transform: perspective(420px) rotateX(62deg) scale(1.7);
+  transform-origin: bottom;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent 80%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent 80%);
+  animation: gridPan 12s linear infinite;
+  pointer-events: none;
+}
+
+/* ===================== ORBITAL MAP FX ===================== */
+
+/* Rotação dos continentes — faixa de 380px com cópia duplicada (wrap contínuo) */
+@keyframes earthSpin {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-380px); }
+}
+.earth-rotate { animation: earthSpin 85s linear infinite; }
+.clouds-drift { animation: earthSpin 140s linear infinite; }
+
+/* Luz de navegação dos satélites */
+@keyframes satBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.1; }
+}
+.sat-blink { animation: satBlink 1.4s ease-in-out infinite; }
+
+/* Fluxo de dados nos feixes de transmissão */
+@keyframes beamFlow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -48; }
+}
+.beam-flow { animation: beamFlow 1.1s linear infinite; }
+
+/* Flicker sutil de HUD */
+@keyframes hudFlicker {
+  0%, 100% { opacity: 0.85; }
+  92%       { opacity: 0.85; }
+  93%       { opacity: 0.35; }
+  94%       { opacity: 0.85; }
+}
+.hud-flicker { animation: hudFlicker 7s linear infinite; }
+
+/* Linha do hover/seleção da lista de satélites */
+.sat-list-row {
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s;
+}
+.sat-list-row:hover { transform: translateX(4px); }
+.sat-list-row-active {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  background:
+    linear-gradient(160deg, rgba(0, 212, 255, 0.12), rgba(13, 21, 48, 0.2) 60%),
+    var(--bg-card) !important;
+  box-shadow: 0 0 22px rgba(0, 212, 255, 0.15);
+}
+
+/* Legenda de órbitas */
+.orbit-legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===================== GLOBO 3D ===================== */
+
+.globe-frame {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(0, 85, 204, 0.10), transparent 70%),
+    rgba(6, 10, 24, 0.55);
+  box-shadow:
+    0 0 40px rgba(0, 85, 204, 0.12),
+    inset 0 0 60px rgba(0, 30, 80, 0.25);
+  overflow: hidden;
+}
+
+.globe-canvas-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.globe-canvas-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+}
+.globe-canvas-wrap canvas:active { cursor: grabbing; }
+
+/* HUD sobreposto */
+.globe-hud {
+  position: absolute;
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.7;
+  color: rgba(0, 212, 255, 0.65);
+  pointer-events: none;
+  z-index: 5;
+}
+.globe-hud-title {
+  font-weight: 700;
+  color: rgba(0, 212, 255, 0.9);
+  letter-spacing: 0.08em;
+}
+.globe-hud-tl { top: 14px; left: 16px; }
+.globe-hud-br { bottom: 14px; right: 16px; text-align: right; }
+
+.globe-hud-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid rgba(0, 212, 255, 0.4);
+  pointer-events: none;
+  z-index: 5;
+}
+.globe-hud-corner-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.globe-hud-corner-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+.globe-hud-corner-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+.globe-hud-corner-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+/* Layout do mapa orbital: empilha no tablet/mobile */
+@media (max-width: 980px) {
+  .orbital-layout {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+  .globe-frame { max-width: 520px; margin: 0 auto; }
+}
+
+/* KPI cards com lift */
+.kpi-card { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s, box-shadow 0.35s; }
+.kpi-card:hover { transform: translateY(-4px); }
 
 /* ===================== MOTION PREFERENCE ===================== */
 

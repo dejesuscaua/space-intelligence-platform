@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Fragment } from 'react'
 import Dashboard from './Dashboard'
+import SpaceBackground from './SpaceBackground'
 import SatelliteTracker from './SatelliteTracker'
 import AlertCenter from './AlertCenter'
 import AgricultureDeepDive from './AgricultureDeepDive'
@@ -68,6 +69,7 @@ export default function AppShell() {
 
   return (
     <div className="app-shell">
+      <SpaceBackground />
       {/* ── Header ─────────────────────────────────────────────────── */}
       <header className="app-header">
         <div className="app-header-left">
@@ -144,12 +146,14 @@ export default function AppShell() {
 
         {/* Main content */}
         <main className="app-main" id="app-main-content">
-          {active === 'dashboard'   && <Dashboard />}
-          {active === 'orbital'     && <SatelliteTracker />}
-          {active === 'alertas'     && <AlertCenter />}
-          {active === 'agro'        && <AgricultureDeepDive />}
-          {active === 'correlacoes' && <CorrelationExample />}
-          {active === 'sobre'       && <Sobre />}
+          <div key={active} className="module-enter">
+            {active === 'dashboard'   && <Dashboard />}
+            {active === 'orbital'     && <SatelliteTracker />}
+            {active === 'alertas'     && <AlertCenter />}
+            {active === 'agro'        && <AgricultureDeepDive />}
+            {active === 'correlacoes' && <CorrelationExample />}
+            {active === 'sobre'       && <Sobre />}
+          </div>
         </main>
       </div>
 
