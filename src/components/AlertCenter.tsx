@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { MOCK_ALERTS, MockAlert } from '@/data/mock'
+import BrazilAlertMap from './BrazilAlertMap'
 import {
   AgriCatIcon,
   ClimateCatIcon,
@@ -161,6 +162,15 @@ export default function AlertCenter() {
             Novo sinal orbital detectado — análise em processamento...
           </div>
         )}
+
+        {/* Mapa tático georreferenciado */}
+        <div style={{ marginBottom: 28 }}>
+          <div className="chart-header" style={{ marginBottom: 14 }}>
+            <span style={{ fontSize: '1rem', fontWeight: 700 }}>Mapa Tático — Alertas Georreferenciados</span>
+            <span className="live-badge">LIVE</span>
+          </div>
+          <BrazilAlertMap onAction={handleAction} />
+        </div>
 
         {/* 3-column board */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 28 }}>

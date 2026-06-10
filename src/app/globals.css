@@ -1431,6 +1431,58 @@ html, body { height: 100%; }
   .globe-frame { max-width: 520px; margin: 0 auto; }
 }
 
+/* ===================== PAINÉIS DE VISUALIZAÇÃO TÁTICA ===================== */
+
+/* Frame genérico no estilo do globo (mapa tático, fazenda, rede neural) */
+.viz-frame {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.18);
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(0, 85, 204, 0.10), transparent 70%),
+    rgba(6, 10, 24, 0.6);
+  box-shadow:
+    0 0 40px rgba(0, 85, 204, 0.10),
+    inset 0 0 60px rgba(0, 30, 80, 0.22);
+  overflow: hidden;
+}
+
+/* Banda de varredura de satélite (vista da fazenda) */
+@keyframes scanBand {
+  0%   { transform: translateY(-50px); }
+  100% { transform: translateY(480px); }
+}
+.scan-band { animation: scanBand 8s linear infinite; }
+
+/* Layout mapa de alertas: mapa + painel de detalhe */
+.alert-map-layout {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .alert-map-layout { grid-template-columns: 1fr; }
+}
+
+/* Marcadores clicáveis */
+.map-marker { cursor: pointer; }
+.map-marker:hover { filter: brightness(1.4); }
+
+/* Painel de detalhe do hotspot (fazenda) */
+.hotspot-panel {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  max-width: 280px;
+  padding: 12px 14px;
+  font-size: 12px;
+  z-index: 6;
+  animation: fadeInScale 0.25s ease;
+}
+
 /* KPI cards com lift */
 .kpi-card { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s, box-shadow 0.35s; }
 .kpi-card:hover { transform: translateY(-4px); }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { NDVI_GRID, REGIONS_RISK, IOT_SENSORS } from '@/data/mock'
+import { REGIONS_RISK, IOT_SENSORS } from '@/data/mock'
+import FarmOrbitalView from './FarmOrbitalView'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { HumidityIcon, TemperatureIcon, PressureIcon, FlowIcon, PinIcon, BrainIcon } from './icons/NavIcons'
 
@@ -10,15 +11,6 @@ const SENSOR_ICON: Record<string, React.ReactNode> = {
   temperature: <TemperatureIcon size={18} />,
   pressure:    <PressureIcon size={18} />,
   flow:        <FlowIcon size={18} />,
-}
-
-function ndviColor(v: number): string {
-  if (v >= 0.65) return '#16a34a'
-  if (v >= 0.55) return '#22c55e'
-  if (v >= 0.45) return '#84cc16'
-  if (v >= 0.35) return '#eab308'
-  if (v >= 0.25) return '#f97316'
-  return '#ef4444'
 }
 
 const STATUS_COLOR: Record<string, string> = { normal: '#22c55e', warning: '#f59e0b', critical: '#ef4444' }
@@ -70,22 +62,16 @@ const HARVEST_FORECAST = [
 ]
 
 export default function AgricultureDeepDive() {
-  const [grid, setGrid] = useState(NDVI_GRID)
   const [sensors, setSensors] = useState(IOT_SENSORS)
-  const [tick, setTick] = useState(0)
 
   useEffect(() => {
     const id = setInterval(() => {
-      setGrid((prev) =>
-        prev.map((v) => +(Math.max(0.15, Math.min(0.85, v + (Math.random() - 0.5) * 0.04))).toFixed(2))
-      )
       setSensors((prev) =>
         prev.map((s) => ({
           ...s,
           value: +(s.value + (Math.random() - 0.5) * (s.type === 'temperature' ? 0.5 : s.type === 'humidity' ? 1.5 : 0.3)).toFixed(1),
         }))
       )
-      setTick((t) => t + 1)
     }, 6000)
     return () => clearInterval(id)
   }, [])
@@ -104,41 +90,35 @@ export default function AgricultureDeepDive() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
-          {/* NDVI Grid */}
-          <div className="glass-card" style={{ padding: '24px' }}>
-            <div className="chart-header" style={{ marginBottom: 16 }}>
-              <span>Mapa NDVI — Sentinel-2A</span>
-              <span className="live-badge">LIVE</span>
-            </div>
-            <div className="ndvi-grid" aria-label="Grade de índice NDVI por satélite">
-              {grid.map((v, i) => (
-                <div
-                  key={i}
-                  className="ndvi-cell"
-                  title={`NDVI: ${v}`}
-                  style={{ background: ndviColor(v) }}
-                />
-              ))}
-            </div>
-            <div className="ndvi-legend">
-              {[
-                { color: '#16a34a', label: '>0.65 Saudável' },
-                { color: '#84cc16', label: '0.45–0.55 Moderado' },
-                { color: '#eab308', label: '0.35–0.44 Estresse' },
-                { color: '#ef4444', label: '<0.25 Crítico' },
-              ].map((l) => (
-                <span key={l.label} className="ndvi-legend-item">
-                  <span style={{ width: 10, height: 10, borderRadius: 2, background: l.color, display: 'inline-block' }} />
-                  {l.label}
-                </span>
-              ))}
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, textAlign: 'center' }}>
-              Resolução 10m/px · Norte MT · Atualização #{tick + 1}
-            </div>
+        {/* Vista orbital da fazenda */}
+        <div style={{ marginBottom: 14 }}>
+          <div className="chart-header" style={{ marginBottom: 14 }}>
+            <span style={{ fontSize: '1rem', fontWeight: 700 }}>Vista Orbital — Mapa NDVI Sentinel-2A</span>
+            <span className="live-badge">LIVE</span>
           </div>
+          <FarmOrbitalView />
+        </div>
 
+        {/* Legenda NDVI */}
+        <div className="ndvi-legend" style={{ justifyContent: 'center', marginBottom: 24 }}>
+          {[
+            { color: '#16a34a', label: '>0.65 Saudável' },
+            { color: '#84cc16', label: '0.45–0.55 Moderado' },
+            { color: '#eab308', label: '0.35–0.44 Estresse' },
+            { color: '#ef4444', label: '<0.25 Crítico' },
+          ].map((l) => (
+            <span key={l.label} className="ndvi-legend-item">
+              <span style={{ width: 10, height: 10, borderRadius: 2, background: l.color, display: 'inline-block' }} />
+              {l.label}
+            </span>
+          ))}
+          <span className="ndvi-legend-item">
+            <span style={{ width: 10, height: 10, borderRadius: '50%', border: '1.5px solid #ef4444', display: 'inline-block' }} />
+            Hotspot de risco (clique)
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
           {/* Region Risk Scores */}
           <div className="glass-card" style={{ padding: '24px' }}>
             <div className="chart-header" style={{ marginBottom: 16 }}>
@@ -165,11 +145,14 @@ export default function AgricultureDeepDive() {
               })}
             </div>
 
-            <div style={{ marginTop: 20 }}>
-              <div className="chart-header" style={{ marginBottom: 12 }}>
-                <span>Previsão Viabilidade Safra — Próx. 4 meses</span>
-              </div>
-              <ResponsiveContainer width="100%" height={130}>
+          </div>
+
+          {/* Harvest Forecast */}
+          <div className="glass-card" style={{ padding: '24px' }}>
+            <div className="chart-header" style={{ marginBottom: 12 }}>
+              <span>Previsão Viabilidade Safra — Próx. 4 meses</span>
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
                 <AreaChart data={HARVEST_FORECAST} margin={{ top: 4, right: 4, bottom: 0, left: -28 }}>
                   <defs>
                     <linearGradient id="viavelGrad" x1="0" y1="0" x2="0" y2="1">
@@ -185,11 +168,10 @@ export default function AgricultureDeepDive() {
                   <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 11 }} />
                   <YAxis tick={{ fill: '#64748b', fontSize: 10 }} />
                   <Tooltip contentStyle={{ background: '#0d1530', border: '1px solid rgba(0,212,255,0.3)', borderRadius: 8, fontSize: 12 }} />
-                  <Area type="monotone" dataKey="viavel" stroke="#22c55e" strokeWidth={2} fill="url(#viavelGrad)" name="Viável %" />
-                  <Area type="monotone" dataKey="risco" stroke="#ef4444" strokeWidth={1.5} fill="url(#riscoGrad)" name="Risco %" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+                <Area type="monotone" dataKey="viavel" stroke="#22c55e" strokeWidth={2} fill="url(#viavelGrad)" name="Viável %" />
+                <Area type="monotone" dataKey="risco" stroke="#ef4444" strokeWidth={1.5} fill="url(#riscoGrad)" name="Risco %" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
 

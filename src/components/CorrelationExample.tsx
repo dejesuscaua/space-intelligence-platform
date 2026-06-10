@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import { CORRELATION_SCENARIOS } from '@/data/mock'
+import CorrelationNetwork from './CorrelationNetwork'
 
 type Sector = 'agricultural' | 'energy' | 'logistics'
 
@@ -101,6 +102,24 @@ export default function CorrelationExample() {
               <span>{tab.icon}</span> {tab.label}
             </button>
           ))}
+        </div>
+
+        {/* Rede neural de correlação */}
+        <div className="reveal" style={{ marginBottom: 24 }}>
+          <div className="viz-frame" style={{ padding: '18px 8px 8px' }}>
+            <CorrelationNetwork scenario={scenario} activeSignals={activeSignals} showResult={showResult} />
+            <div className="globe-hud globe-hud-tl hud-flicker">
+              <div className="globe-hud-title">CORRELATION INTELLIGENCE™ — PIPELINE</div>
+              <div>{scenario.region.toUpperCase()}</div>
+            </div>
+            <div className="globe-hud globe-hud-br hud-flicker">
+              {showResult ? 'STATUS ▸ INSIGHT EMITIDO' : 'STATUS ▸ INGESTÃO DE SINAIS'}
+            </div>
+            <span className="globe-hud-corner globe-hud-corner-tl" aria-hidden="true" />
+            <span className="globe-hud-corner globe-hud-corner-tr" aria-hidden="true" />
+            <span className="globe-hud-corner globe-hud-corner-bl" aria-hidden="true" />
+            <span className="globe-hud-corner globe-hud-corner-br" aria-hidden="true" />
+          </div>
         </div>
 
         <div className="reveal grid-2" style={{ marginBottom: 40 }}>
